@@ -124,7 +124,7 @@ export async function retryEmail(
   await emailQueue.add(
     'send-email',
     { submissionId, organizationId: submission.form.organizationId },
-    { jobId: `email-retry:${submissionId}` }
+    { jobId: `email-retry-${submissionId}` }
   );
 
   logger.info('Email retry enqueued', { correlationId, submissionId });
@@ -185,7 +185,7 @@ export async function retryWebhook(
   await webhookQueue.add(
     'send-webhook',
     { submissionId, organizationId: submission.form.organizationId },
-    { jobId: `webhook-retry:${submissionId}` }
+    { jobId: `webhook-retry-${submissionId}` }
   );
 
   logger.info('Webhook retry enqueued', { correlationId, submissionId });

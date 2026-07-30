@@ -235,12 +235,12 @@ function buildEmailHtml(submission: {
 // --- Start workers ---
 const connection = getRedis();
 
-const emailWorker = new Worker('notifications:email', processEmailJob, {
+const emailWorker = new Worker('notifications-email', processEmailJob, {
   connection,
   concurrency: 5,
 });
 
-const webhookWorker = new Worker('notifications:webhook', processWebhookJob, {
+const webhookWorker = new Worker('notifications-webhook', processWebhookJob, {
   connection,
   concurrency: 3,
 });

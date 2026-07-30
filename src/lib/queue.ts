@@ -26,5 +26,5 @@ function createQueue(name: string): Queue {
   });
 }
 
-export const emailQueue = createQueue('notifications:email');
-export const webhookQueue = createQueue('notifications:webhook');
+export const emailQueue = createQueue('notifications-email');
+export const webhookQueue = createQueue('notifications-webhook');
