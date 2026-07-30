@@ -20,15 +20,17 @@ interface Form {
   version: number;
 }
 
-// Only Draft → Published and Published → Archived are allowed.
-// Archived forms have no valid transitions — they are immutable snapshots.
-// Re-publishing a Published form or publishing an Archived form directly
-// are rejected per tests 2 & 3. (Test 4 contradicts this by expecting
-// Published → Published to succeed — see handoff 03-code-ui.md.)
+// Valid transitions:
+//   Draft     → Published
+//   Published → Archived
+//   Archived  → Draft (newDraft — creates a fresh editable copy, version unchanged)
+//
+// Re-publishing a Published form is rejected: to create a new version,
+// archive first, then create a new Draft from the Archived state.
 const VALID_TRANSITIONS: Record<string, FormStatus[]> = {
   Draft: ['Published'],
   Published: ['Archived'],
-  Archived: [],
+  Archived: ['Draft'],
 };
 
 /**
@@ -37,7 +39,7 @@ const VALID_TRANSITIONS: Record<string, FormStatus[]> = {
  */
 export function transitionForm(
   form: Form,
-  action: 'publish' | 'archive',
+  action: 'publish' | 'archive' | 'newDraft',
   _userId: string,
   role: 'Admin' | 'Employee'
 ): Form {
@@ -62,6 +64,13 @@ export function transitionForm(
       throw new Error('Invalid transition');
     }
     return { ...form, status: 'Archived' };
+  }
+
+  if (action === 'newDraft') {
+    if (!targets.includes('Draft')) {
+      throw new Error('Invalid transition');
+    }
+    return { ...form, status: 'Draft' };
   }
 
   throw new Error('Invalid transition');

@@ -91,15 +91,24 @@ describe('Form state transitions', () => {
 
   // --- Immutable published versions ---
 
-  it('publishes a second time creating version 2 (new snapshot)', () => {
-    const v1 = baseForm({ status: 'Published', version: 1 });
-    const v2 = transitionForm(v1, 'publish', 'admin-1', 'Admin');
-    // Re-publishing after archive is a separate concern; here we verify
-    // that a second publish increments the version.
-    // NOTE: This assumes an Archived -> Published transition exists or that
-    // the form was un-archived first. The actual transition path is tested
-    // separately; this test only proves version semantics.
-    expect(v2.version).toBeGreaterThanOrEqual(2);
+  it('creates a new Draft from Archived and publishes as version 2', () => {
+    // Step 1: publish Draft → Published (version 1)
+    const draft = baseForm();
+    const published = transitionForm(draft, 'publish', 'admin-1', 'Admin');
+    expect(published.version).toBe(1);
+
+    // Step 2: archive Published → Archived
+    const archived = transitionForm(published, 'archive', 'admin-1', 'Admin');
+    expect(archived.status).toBe('Archived');
+
+    // Step 3: create new Draft from Archived (version stays 1)
+    const newDraft = transitionForm(archived, 'newDraft', 'admin-1', 'Admin');
+    expect(newDraft.status).toBe('Draft');
+    expect(newDraft.version).toBe(1);
+
+    // Step 4: publish new Draft → Published (version 2)
+    const v2 = transitionForm(newDraft, 'publish', 'admin-1', 'Admin');
+    expect(v2.version).toBe(2);
   });
 
   // --- Draft re-entry from Archived (if implemented) ---
