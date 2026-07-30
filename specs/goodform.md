@@ -37,7 +37,23 @@
 
 ## Technical contract
 
-[Pendiente de completar por @architect]
+### Data Model
+- Organization: id, name.
+- User: id, email, role (Admin|Employee), organizationId.
+- Form: id, title, organizationId, status (Draft|Published|Archived), version.
+- Question: id, formId, type (Text|Email|Select|MultiSelect|Rating|LongAnswer), required, order, settings (JSON).
+- LogicRule: id, questionId, condition (JSON), action (Jump|End).
+- Submission: id, formId, token, version, createdAt.
+- Answer: id, submissionId, questionId, value.
+
+### API Shape
+- See `docs/contract.md` for endpoints, types, and error patterns.
+
+### Security
+- Auth: Custom session management via Lucia Auth.
+- Authorization: Middleware checking `organizationId` and `role` per endpoint.
+- GDPR: Normalization, encryption of PII, retention policies in `src/domain/gdpr.ts`.
+
 
 ## New dependencies found
 
