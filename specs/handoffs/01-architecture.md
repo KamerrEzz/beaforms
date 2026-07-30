@@ -15,4 +15,4 @@
 - `specs/goodform.md` § Technical contract
 
 ## Left undone / uncertain
-- None. Design is ready for testing.
+- None. Design updated to address GDPR and idempotency findings.

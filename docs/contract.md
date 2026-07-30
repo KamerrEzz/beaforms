@@ -27,3 +27,11 @@
 ### Results (Admin/Employee)
 - `GET /api/forms/:id/results` -> { submissions[] }
 - `GET /api/forms/:id/export` -> CSV
+
+### GDPR & Data Management (Admin only)
+- `POST /api/gdpr/data-export` -> { downloadUrl }
+- `POST /api/gdpr/data-deletion` -> 202 Accepted
+
+### Webhook Management (Admin only)
+- `GET /api/submissions/:id/webhook-status` -> { status, lastAttempt }
+- `POST /api/submissions/:id/webhook-retry` -> 202 Accepted

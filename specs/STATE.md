@@ -31,10 +31,10 @@ Trace each id to the code that enforces it AND the test that
 would fail without it. Untested is unenforced.
 
 ## Artifacts on disk
-none of the usual artifacts found yet.
+contract        docs/contract.md
 
 ## Handoffs
-none written yet.
+handoffs/01-architecture.md
 
 ## Open findings
 [Vacío]
