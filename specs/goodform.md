@@ -61,8 +61,8 @@
 
 ## Open findings
 
-- [Phase 1] Audit R1 Failed: GDPR management/deletion missing in API.
-- [Phase 1] Audit R4 Failed: Idempotency/retry endpoints for webhooks/emails missing in API.
+- [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.
+- [Phase 1] R4 fixed: Notification management endpoints added for both email and webhook retries.
 
 
 ## Decision log

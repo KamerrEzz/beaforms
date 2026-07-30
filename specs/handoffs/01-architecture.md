@@ -15,4 +15,4 @@
 - `specs/goodform.md` § Technical contract
 
 ## Left undone / uncertain
-- None. Design updated to address GDPR and idempotency findings.
+- None. All audit findings resolved. Ready for Phase 2.

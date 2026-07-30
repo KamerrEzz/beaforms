@@ -32,6 +32,7 @@
 - `POST /api/gdpr/data-export` -> { downloadUrl }
 - `POST /api/gdpr/data-deletion` -> 202 Accepted
 
-### Webhook Management (Admin only)
-- `GET /api/submissions/:id/webhook-status` -> { status, lastAttempt }
-- `POST /api/submissions/:id/webhook-retry` -> 202 Accepted
+### Notification Management (Admin only)
+- `GET /api/submissions/:id/notifications` -> { email: { status, lastAttempt }, webhook: { status, lastAttempt } }
+- `POST /api/submissions/:id/notifications/email/retry` -> 202 Accepted
+- `POST /api/submissions/:id/notifications/webhook/retry` -> 202 Accepted
