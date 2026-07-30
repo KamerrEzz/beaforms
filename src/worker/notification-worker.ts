@@ -6,6 +6,9 @@
  *
  * Email: uses nodemailer in production, a dev fake in development.
  * Webhook: HTTP POST with HMAC-SHA256 signature and exponential backoff.
+ *
+ * Graceful shutdown: handles SIGTERM/SIGINT to close workers, Prisma,
+ * and Redis connections cleanly before exiting.
  */
 
 import { Worker, Job } from 'bullmq';
@@ -229,7 +232,7 @@ function buildEmailHtml(submission: {
   `;
 }
 
-// Start the workers.
+// --- Start workers ---
 const connection = getRedis();
 
 const emailWorker = new Worker('notifications:email', processEmailJob, {
@@ -251,5 +254,44 @@ webhookWorker.on('failed', (job, err) => {
 });
 
 logger.info('Notification workers started');
+
+// --- Graceful shutdown ---
+const SHUTDOWN_TIMEOUT_MS = 8_000;
+
+async function gracefulShutdown(signal: string) {
+  logger.info(`Received ${signal}, shutting down gracefully...`);
+
+  const deadline = setTimeout(() => {
+    logger.error('Shutdown timed out, forcing exit');
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS);
+
+  try {
+    // Stop accepting new jobs
+    await emailWorker.close();
+    await webhookWorker.close();
+    logger.info('BullMQ workers closed');
+
+    // Close database connection
+    await db.$disconnect();
+    logger.info('Prisma connection closed');
+
+    // Close Redis connection
+    await connection.quit();
+    logger.info('Redis connection closed');
+
+    clearTimeout(deadline);
+    logger.info('Shutdown complete');
+    process.exit(0);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Error during shutdown', { error: message });
+    clearTimeout(deadline);
+    process.exit(1);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 export { emailWorker, webhookWorker };

@@ -1,0 +1,48 @@
+# Development environment — NOT for production
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: goodform
+      POSTGRES_PASSWORD: goodform_dev
+      POSTGRES_DB: goodform
+    volumes:
+      - db-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goodform"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://goodform:goodform_dev@db:5432/goodform
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: dev-session-secret-do-not-use-in-prod
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  db-dev-data:
