@@ -22,6 +22,7 @@ type Endpoint =
   | 'forms.list'
   | 'forms.create'
   | 'forms.get'
+  | 'forms.edit'
   | 'forms.publish'
   | 'results.get'
   | 'results.export'
@@ -35,6 +36,7 @@ const ADMIN_ENDPOINTS: Endpoint[] = [
   'forms.list',
   'forms.create',
   'forms.get',
+  'forms.edit',
   'forms.publish',
   'gdpr.export',
   'gdpr.delete',

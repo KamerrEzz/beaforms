@@ -103,7 +103,7 @@ function resolveEndpoint(pathname: string, method: string): Endpoint | null {
     if (segments[3] === 'publish') return 'forms.publish';
     if (segments[3] === 'results') return 'results.get';
     if (segments[3] === 'export') return 'results.export';
-    if (!segments[3]) return 'forms.get';
+    if (!segments[3]) return method === 'GET' ? 'forms.get' : 'forms.edit';
   }
 
   // /api/submissions/:id/notifications
