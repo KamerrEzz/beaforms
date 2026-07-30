@@ -34,7 +34,7 @@ const {
    * Priority:
    * 1. localStorage preference (explicit user choice)
    * 2. prefers-color-scheme media query (OS-level)
-   * 3. light (fallback)
+   * 3. dark (default fallback)
    */
   (function () {
     const html = document.documentElement;
@@ -45,7 +45,7 @@ const {
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       html.setAttribute('data-theme', 'dark');
     } else {
-      html.setAttribute('data-theme', 'light');
+      html.setAttribute('data-theme', 'dark');
     }
   })();
 </script>
