@@ -26,8 +26,8 @@
 
 ## Phases
 
-- [ ] Phase 1 — Architecture (@architect): technical contract and stack decisions (in progress)
-- [ ] Phase 2 — Testing (@testing): expected behavior as tests
+- [x] Phase 1 — Architecture (@architect): technical contract and stack decisions
+- [ ] Phase 2 — Testing (@testing): expected behavior as tests (in progress)
 - [ ] Phase 3 — Code (@code): implementation against those tests
 - [ ] Phase 4 — Audit (@audit): code meets tests and contract
 - [ ] Phase 5 — Security (@security): OWASP Top 10 2025 audit

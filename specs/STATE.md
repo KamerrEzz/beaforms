@@ -6,14 +6,14 @@
 spec: specs/goodform.md
 
 ## Phase
-current:  1 — Architecture
+current:  2 — Testing
 status:   IN PROGRESS (interrupted work possible)
-owner:    @architect
-progress: 0/8 closed
+owner:    @testing
+progress: 1/8 closed
 
 ## Phases
-[»] 1. Architecture @architect
-[ ] 2. Testing @testing
+[x] 1. Architecture @architect
+[»] 2. Testing @testing
 [ ] 3. Code @code
 [ ] 4. Audit @audit
 [ ] 5. Security @security
@@ -37,8 +37,8 @@ contract        docs/contract.md
 handoffs/01-architecture.md
 
 ## Open findings
-- [Phase 1] Audit R1 Failed: GDPR management/deletion missing in API.
-- [Phase 1] Audit R4 Failed: Idempotency/retry endpoints for webhooks/emails missing in API.
+- [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.
+- [Phase 1] R4 fixed: Notification management endpoints added for both email and webhook retries.
 
 ## How to read this project
 1. This file.
