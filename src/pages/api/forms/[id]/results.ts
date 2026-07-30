@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
-import { getResults } from '../../../actions/results';
-import { getSessionUser } from '../../../auth/middleware';
-import { authorize } from '../../../domain/authorization';
-import { db } from '../../../lib/db';
+import { getResults } from '../../../../actions/results';
+import { getSessionUser } from '../../../../auth/middleware';
+import { authorize } from '../../../../domain/authorization';
+import { db } from '../../../../lib/db';
 
 export const GET: APIRoute = async ({ params, request, cookies }) => {
   const correlationId = crypto.randomUUID();

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { retryWebhook } from '../../../../../actions/notifications';
-import { getSessionUser } from '../../../../../auth/middleware';
-import { authorize } from '../../../../../domain/authorization';
+import { retryWebhook } from '../../../../../../actions/notifications';
+import { getSessionUser } from '../../../../../../auth/middleware';
+import { authorize } from '../../../../../../domain/authorization';
 
 export const POST: APIRoute = async ({ params, cookies }) => {
   const correlationId = crypto.randomUUID();
