@@ -31,12 +31,14 @@ would fail without it. Untested is unenforced.
 contract        docs/contract.md
 readme          README.md
 dockerfile      Dockerfile
+migrations      prisma/migrations
 adrs            docs/adr
 license         LICENSE.md
 
 ## Handoffs
 handoffs/01-architecture.md
 handoffs/02-testing.md
+handoffs/03-code-fix-integration-tests.md
 handoffs/03-code-infra.md
 handoffs/03-code-ui.md
 handoffs/04-audit.md
