@@ -47,19 +47,13 @@ if (Astro.request.method === 'POST') {
 }
 ---
 <DashboardLayout title={`${formData.form.title} - Goodform`}>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+  <div class="card-header" style="margin-bottom:1.5rem;">
     <div>
-      <a href="/forms" style="font-size:0.875rem;color:var(--color-text-muted);">&larr; Back to forms</a>
+      <a href="/forms" class="text-muted text-sm">&larr; Back to forms</a>
       <h1 style="font-size:1.5rem;font-weight:700;margin-top:0.25rem;">{String(formData.form.title)}</h1>
     </div>
-    <div style="display:flex;gap:0.5rem;">
-      <span style={`display:inline-block;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:500;${
-        formData.form.status === 'Published'
-          ? 'background:#dcfce7;color:#166534;'
-          : formData.form.status === 'Archived'
-          ? 'background:#fef3c7;color:#92400e;'
-          : 'background:#f1f5f9;color:#475569;'
-      }`}>
+    <div class="flex gap-2">
+      <span class:list={['badge', formData.form.status === 'Published' ? 'badge-published' : formData.form.status === 'Archived' ? 'badge-archived' : 'badge-draft']}>
         {String(formData.form.status)} v{String(formData.form.version)}
       </span>
       {formData.form.status === 'Draft' && (
@@ -70,23 +64,23 @@ if (Astro.request.method === 'POST') {
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;">
+  <div class="form-detail-grid">
     <div>
       <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Questions</h2>
       {formData.questions.length === 0 ? (
-        <div style="background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);padding:2rem;text-align:center;color:var(--color-text-muted);">
+        <div class="card" style="border-style:dashed;text-align:center;color:var(--color-text-muted);">
           No questions yet. Add questions to build your form.
         </div>
       ) : (
-        <div>
+        <div class="stack">
           {formData.questions.map((q, i) => (
-            <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
+            <div class="card flex items-center justify-between" style="padding:1rem;background:var(--color-surface);">
               <div>
                 <span style="font-weight:500;">{q.settings?.label ? String(q.settings.label) : ('Question ' + String(i + 1))}</span>
-                <span style="margin-left:0.5rem;font-size:0.75rem;color:var(--color-text-muted);">({String(q.type)})</span>
+                <span class="text-muted text-sm" style="margin-left:0.5rem;">({String(q.type)})</span>
                 {q.required && <span style="margin-left:0.25rem;color:var(--color-error);">*</span>}
               </div>
-              <span style="font-size:0.75rem;color:var(--color-text-muted);">#{String(q.order)}</span>
+              <span class="text-muted text-xs">#{String(q.order)}</span>
             </div>
           ))}
         </div>
@@ -95,22 +89,36 @@ if (Astro.request.method === 'POST') {
 
     <div>
       <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Settings</h2>
-      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;">
-        <div style="margin-bottom:0.75rem;">
-          <span style="font-size:0.875rem;color:var(--color-text-muted);">Form ID</span>
+      <div class="card stack" style="gap:0.75rem;">
+        <div>
+          <span class="text-muted text-sm">Form ID</span>
           <div style="font-family:monospace;font-size:0.875rem;word-break:break-all;">{formId}</div>
         </div>
-        <div style="margin-bottom:0.75rem;">
-          <span style="font-size:0.875rem;color:var(--color-text-muted);">Public URL</span>
+        <div>
+          <span class="text-muted text-sm">Public URL</span>
           <div style="font-family:monospace;font-size:0.875rem;">
             <a href={`/f/${formData.form.id}`} target="_blank">/f/{String(formData.form.id)}</a>
           </div>
         </div>
         <div>
-          <span style="font-size:0.875rem;color:var(--color-text-muted);">Questions</span>
+          <span class="text-muted text-sm">Questions</span>
           <div style="font-size:0.875rem;">{formData.questions.length}</div>
         </div>
       </div>
     </div>
   </div>
 </DashboardLayout>
+
+<style>
+  .form-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-detail-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

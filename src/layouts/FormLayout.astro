@@ -8,9 +8,33 @@ interface Props {
 const { title } = Astro.props;
 ---
 <BaseLayout title={title}>
-  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--color-surface);">
-    <div style="width:100%;max-width:640px;padding:2rem;">
+  <div class="form-layout">
+    <div class="form-layout-inner">
       <slot />
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  .form-layout {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    padding: 1.5rem;
+  }
+
+  .form-layout-inner {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  @media (max-width: 480px) {
+    .form-layout {
+      padding: 1rem;
+      align-items: flex-start;
+      padding-top: 2rem;
+    }
+  }
+</style>

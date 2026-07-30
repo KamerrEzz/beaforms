@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
 
 interface Props {
   title?: string;
@@ -8,29 +9,78 @@ interface Props {
 const { title } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
+
 <BaseLayout title={title}>
-  <div style="display:flex;min-height:100vh;">
-    <aside style="width:240px;background:var(--color-surface);border-right:1px solid var(--color-border);padding:1.5rem 0;">
-      <div style="padding:0 1.5rem;margin-bottom:2rem;">
-        <a href="/" style="font-size:1.25rem;font-weight:700;color:var(--color-text);text-decoration:none;">
-          Goodform
-        </a>
+  <!-- Mobile header bar -->
+  <div class="mobile-header">
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+    <span class="mobile-header-title">Goodform</span>
+    <ThemeToggle />
+  </div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <a href="/">Goodform</a>
       </div>
+
       <nav>
-        <ul style="list-style:none;">
+        <ul class="sidebar-nav">
           <li>
-            <a
-              href="/forms"
-              style={`display:block;padding:0.5rem 1.5rem;color:${currentPath.startsWith('/forms') ? 'var(--color-primary)' : 'var(--color-text-muted)'};text-decoration:none;font-size:0.875rem;font-weight:${currentPath.startsWith('/forms') ? '600' : '400'};`}
-            >
+            <a href="/forms" class:list={{ active: currentPath.startsWith('/forms') }}>
               Forms
             </a>
           </li>
         </ul>
       </nav>
+
+      <div class="sidebar-footer">
+        <ThemeToggle variant="full" />
+      </div>
     </aside>
-    <main style="flex:1;padding:2rem;">
+
+    <!-- Main Content -->
+    <main class="main-content">
       <slot />
     </main>
   </div>
 </BaseLayout>
+
+<script>
+  const toggle = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  if (toggle && sidebar && overlay) {
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', () => {
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    // Close sidebar on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+        closeSidebar();
+      }
+    });
+  }
+</script>

@@ -28,10 +28,12 @@ const forms = 'forms' in result.body ? (result.body as { forms: Array<{
 }> }).forms : [];
 ---
 <DashboardLayout title="Forms - Goodform">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+  <div class="card-header" style="margin-bottom:1.5rem;">
     <h1 style="font-size:1.5rem;font-weight:700;">Forms</h1>
-    <a href="/forms/new" class="btn">New Form</a>
+    <a href="/forms/new" class="btn">+ New Form</a>
   </div>
 
-  <FormsTable forms={forms} />
+  <div class="card" style="padding:0;">
+    <FormsTable forms={forms} />
+  </div>
 </DashboardLayout>

@@ -9,8 +9,9 @@ const {
   description = 'Build and manage forms with ease',
 } = Astro.props;
 ---
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,102 +20,32 @@ const {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style is:global>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --color-primary: #2563eb;
-      --color-primary-hover: #1d4ed8;
-      --color-bg: #ffffff;
-      --color-surface: #f8fafc;
-      --color-border: #e2e8f0;
-      --color-text: #1e293b;
-      --color-text-muted: #64748b;
-      --color-success: #16a34a;
-      --color-error: #dc2626;
-      --color-warning: #f59e0b;
-      --radius: 8px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      color: var(--color-text);
-      background: var(--color-bg);
-      line-height: 1.6;
-    }
-
-    a {
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    button {
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 0.875rem;
-      font-weight: 500;
-      background: var(--color-primary);
-      color: white;
-      transition: background 0.15s;
-    }
-
-    .btn:hover {
-      background: var(--color-primary-hover);
-      text-decoration: none;
-    }
-
-    .btn-secondary {
-      background: var(--color-surface);
-      color: var(--color-text);
-      border: 1px solid var(--color-border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--color-border);
-    }
-
-    .btn-danger {
-      background: var(--color-error);
-    }
-
-    .btn-danger:hover {
-      background: #b91c1c;
-    }
-
-    .input {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      font-size: 0.875rem;
-      font-family: inherit;
-    }
-
-    .input:focus {
-      outline: 2px solid var(--color-primary);
-      outline-offset: -1px;
-    }
-  </style>
+  <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
 <body>
   <slot />
 </body>
 </html>
+
+<script>
+  /**
+   * Theme initialization — runs before first paint to prevent flash.
+   *
+   * Priority:
+   * 1. localStorage preference (explicit user choice)
+   * 2. prefers-color-scheme media query (OS-level)
+   * 3. light (fallback)
+   */
+  (function () {
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+
+    if (stored) {
+      html.setAttribute('data-theme', stored);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      html.setAttribute('data-theme', 'dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>

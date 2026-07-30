@@ -56,9 +56,9 @@ const questions = submissions.length > 0
   : [];
 ---
 <DashboardLayout title={`Results: ${formRecord.title} - Goodform`}>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+  <div class="card-header" style="margin-bottom:1.5rem;">
     <div>
-      <a href={`/forms/${formId}`} style="font-size:0.875rem;color:var(--color-text-muted);">&larr; Back to form</a>
+      <a href={`/forms/${formId}`} class="text-muted text-sm">&larr; Back to form</a>
       <h1 style="font-size:1.5rem;font-weight:700;margin-top:0.25rem;">Results: {formRecord.title}</h1>
     </div>
     <CsvExport formId={formId} />
