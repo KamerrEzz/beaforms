@@ -32,7 +32,7 @@ export const GET: APIRoute = async ({ params, cookies }) => {
     });
   }
 
-  const result = await getNotificationStatus(submissionId, correlationId);
+  const result = await getNotificationStatus(submissionId, user.organizationId, correlationId);
   return new Response(JSON.stringify(result.body), {
     status: result.status,
     headers: { 'Content-Type': 'application/json' },

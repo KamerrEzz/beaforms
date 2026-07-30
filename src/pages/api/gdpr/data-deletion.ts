@@ -24,8 +24,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   const body = await request.json();
+  // CRITICAL FIX: Never accept organizationId from user input — derive from session.
   const result = await requestDataDeletion(
-    { ...body, organizationId: body.organizationId ?? user.organizationId },
+    { userId: body.userId, olderThanDays: body.olderThanDays },
+    user.organizationId,
     correlationId
   );
 

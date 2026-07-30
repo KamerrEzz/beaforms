@@ -192,6 +192,19 @@ async function processWebhookJob(job: Job<NotificationJobData>) {
   }
 }
 
+/**
+ * Escape HTML special characters to prevent XSS.
+ * MEDIUM FIX #05: User-supplied data must be escaped before HTML interpolation.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function buildEmailHtml(submission: {
   form: { title: string };
   answers: Array<{ question: { settings: unknown }; value: unknown }>;
@@ -199,14 +212,16 @@ function buildEmailHtml(submission: {
   const rows = submission.answers
     .map((a) => {
       const settings = a.question.settings as Record<string, unknown>;
-      const label = settings.label ? String(settings.label) : 'Question';
-      const value = Array.isArray(a.value) ? a.value.join(', ') : String(a.value);
+      const label = settings.label ? escapeHtml(String(settings.label)) : 'Question';
+      const value = escapeHtml(
+        Array.isArray(a.value) ? a.value.join(', ') : String(a.value)
+      );
       return `<tr><td style="padding:8px;border:1px solid #ddd;">${label}</td><td style="padding:8px;border:1px solid #ddd;">${value}</td></tr>`;
     })
     .join('');
 
   return `
-    <h2>Response to: ${submission.form.title}</h2>
+    <h2>Response to: ${escapeHtml(submission.form.title)}</h2>
     <table style="border-collapse:collapse;width:100%;">
       <thead><tr><th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;">Question</th><th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;">Answer</th></tr></thead>
       <tbody>${rows}</tbody>

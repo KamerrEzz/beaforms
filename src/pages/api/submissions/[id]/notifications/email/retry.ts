@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ params, cookies }) => {
     });
   }
 
-  const result = await retryEmail(submissionId, correlationId);
+  const result = await retryEmail(submissionId, user.organizationId, correlationId);
   return new Response(JSON.stringify(result.body), {
     status: result.status,
     headers: { 'Content-Type': 'application/json' },

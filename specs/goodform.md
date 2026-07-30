@@ -28,9 +28,9 @@
 
 - [x] Phase 1 — Architecture (@architect): technical contract and stack decisions
 - [x] Phase 2 — Testing (@testing): expected behavior as tests
-- [ ] Phase 3 — Code (@code): implementation against those tests (in progress)
-- [ ] Phase 4 — Audit (@audit): code meets tests and contract
-- [ ] Phase 5 — Security (@security): OWASP Top 10 2025 audit
+- [x] Phase 3 — Code (@code): implementation against those tests
+- [x] Phase 4 — Audit (@audit): code meets tests and contract
+- [ ] Phase 5 — Security (@security): OWASP Top 10 2025 audit (in progress)
 - [ ] Phase 6 — Delivery (@delivery): Docker, CI, observability, migrations
 - [ ] Phase 7 — Documentation (@docs): README, API, ADRs, license
 - [ ] Phase 8 — Closeout (@audit): production readiness verdict
@@ -63,6 +63,15 @@
 
 - [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.
 - [Phase 1] R4 fixed: Notification management endpoints added for both email and webhook retries.
+- [Phase 5] CRITICAL — FINDING-01: GDPR endpoints accept user-supplied organizationId, allowing cross-tenant data export/deletion.
+- [Phase 5] CRITICAL — FINDING-02: Login does not verify password (complete auth bypass).
+- [Phase 5] HIGH — FINDING-03: Notification endpoints missing organization scoping (cross-tenant data leak).
+- [Phase 5] HIGH — FINDING-04: No rate limiting on login endpoint (brute-force vector).
+- [Phase 5] MEDIUM — FINDING-05: XSS in email HTML builder (user data injected unescaped).
+- [Phase 5] MEDIUM — FINDING-06: No security headers configured (CSP, HSTS, X-Frame-Options, etc.).
+- [Phase 5] MEDIUM — FINDING-07: Session not invalidated on login (multiple concurrent sessions).
+- [Phase 5] LOW — FINDING-08: Rate limiting on submissions is not atomic (race condition).
+- [Phase 5] LOW — FINDING-09: Missing nodemailer dependency in package.json.
 
 
 ## Decision log

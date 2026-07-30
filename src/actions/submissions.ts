@@ -43,27 +43,21 @@ export async function submitForm(
 
   const { formId, token, answers } = parsed.data;
 
-  // Rate limiting via Redis sliding window.
+  // Rate limiting via Redis INCR + EXPIRE (atomic, no race condition).
   const redis = getRedis();
   const rateKey = `rate:submission:${formId}`;
-  const now = Date.now();
-  const windowStart = now - RATE_LIMIT_WINDOW * 1000;
+  const count = await redis.incr(rateKey);
+  if (count === 1) {
+    await redis.expire(rateKey, RATE_LIMIT_WINDOW);
+  }
 
-  // Remove old entries and count current window.
-  await redis.zremrangebyscore(rateKey, 0, windowStart);
-  const count = await redis.zcard(rateKey);
-
-  if (count >= RATE_LIMIT_MAX) {
+  if (count > RATE_LIMIT_MAX) {
     logger.warn('Rate limit exceeded', { correlationId, formId });
     return {
       status: 429,
       body: { error: 'Rate limit exceeded. Please try again later.' },
     };
   }
-
-  // Add current request to the window.
-  await redis.zadd(rateKey, now, `${now}:${correlationId}`);
-  await redis.expire(rateKey, RATE_LIMIT_WINDOW);
 
   // Check idempotency — same token returns existing submission.
   const existing = await db.submission.findUnique({

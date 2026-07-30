@@ -12,12 +12,10 @@ import { emailQueue } from '../lib/queue';
 import { logger } from '../lib/logger';
 
 const exportSchema = z.object({
-  organizationId: z.string(),
   userId: z.string().optional(),
 });
 
 const deletionSchema = z.object({
-  organizationId: z.string(),
   userId: z.string().optional(),
   olderThanDays: z.number().int().positive().optional(),
 });
@@ -29,6 +27,7 @@ export interface GdprActionResult {
 
 export async function requestDataExport(
   input: unknown,
+  organizationId: string,
   correlationId?: string
 ): Promise<GdprActionResult> {
   const parsed = exportSchema.safeParse(input);
@@ -37,7 +36,7 @@ export async function requestDataExport(
     return { status: 400, body: { error: 'Invalid input' } };
   }
 
-  const { organizationId, userId } = parsed.data;
+  const { userId } = parsed.data;
 
   // Verify organization exists.
   const org = await db.organization.findUnique({ where: { id: organizationId } });
@@ -73,6 +72,7 @@ export async function requestDataExport(
 
 export async function requestDataDeletion(
   input: unknown,
+  organizationId: string,
   correlationId?: string
 ): Promise<GdprActionResult> {
   const parsed = deletionSchema.safeParse(input);
@@ -81,7 +81,7 @@ export async function requestDataDeletion(
     return { status: 400, body: { error: 'Invalid input' } };
   }
 
-  const { organizationId, userId, olderThanDays } = parsed.data;
+  const { userId, olderThanDays } = parsed.data;
 
   // Verify organization exists.
   const org = await db.organization.findUnique({ where: { id: organizationId } });

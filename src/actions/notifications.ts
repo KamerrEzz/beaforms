@@ -22,8 +22,23 @@ export interface NotificationStatusResult {
 
 export async function getNotificationStatus(
   submissionId: string,
+  organizationId: string,
   correlationId?: string
 ): Promise<NotificationStatusResult> {
+  // HIGH FIX #03: Verify submission belongs to the user's organization.
+  const submission = await db.submission.findUnique({
+    where: { id: submissionId },
+    include: { form: { select: { organizationId: true } } },
+  });
+
+  if (!submission) {
+    return { status: 404, body: { error: 'Submission not found' } };
+  }
+
+  if (submission.form.organizationId !== organizationId) {
+    return { status: 404, body: { error: 'Submission not found' } };
+  }
+
   const jobs = await db.notificationJob.findMany({
     where: { submissionId },
     select: { channel: true, status: true, lastAttempt: true },
@@ -54,6 +69,7 @@ export async function getNotificationStatus(
 
 export async function retryEmail(
   submissionId: string,
+  organizationId: string,
   correlationId?: string
 ): Promise<{ status: number; body: { message: string } | { error: string } }> {
   const submission = await db.submission.findUnique({
@@ -65,6 +81,11 @@ export async function retryEmail(
   });
 
   if (!submission) {
+    return { status: 404, body: { error: 'Submission not found' } };
+  }
+
+  // HIGH FIX #03: Verify submission belongs to the user's organization.
+  if (submission.form.organizationId !== organizationId) {
     return { status: 404, body: { error: 'Submission not found' } };
   }
 
@@ -112,6 +133,7 @@ export async function retryEmail(
 
 export async function retryWebhook(
   submissionId: string,
+  organizationId: string,
   correlationId?: string
 ): Promise<{ status: number; body: { message: string } | { error: string } }> {
   const submission = await db.submission.findUnique({
@@ -122,6 +144,11 @@ export async function retryWebhook(
   });
 
   if (!submission) {
+    return { status: 404, body: { error: 'Submission not found' } };
+  }
+
+  // HIGH FIX #03: Verify submission belongs to the user's organization.
+  if (submission.form.organizationId !== organizationId) {
     return { status: 404, body: { error: 'Submission not found' } };
   }
 

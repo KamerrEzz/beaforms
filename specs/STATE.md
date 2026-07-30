@@ -6,17 +6,17 @@
 spec: specs/goodform.md
 
 ## Phase
-current:  3 — Code
+current:  5 — Security
 status:   IN PROGRESS (interrupted work possible)
-owner:    @code
-progress: 2/8 closed
+owner:    @security
+progress: 4/8 closed
 
 ## Phases
 [x] 1. Architecture @architect
 [x] 2. Testing @testing
-[»] 3. Code @code
-[ ] 4. Audit @audit
-[ ] 5. Security @security
+[x] 3. Code @code
+[x] 4. Audit @audit
+[»] 5. Security @security
 [ ] 6. Delivery @delivery
 [ ] 7. Documentation @docs
 [ ] 8. Closeout @audit
@@ -36,6 +36,9 @@ contract        docs/contract.md
 ## Handoffs
 handoffs/01-architecture.md
 handoffs/02-testing.md
+handoffs/03-code-infra.md
+handoffs/03-code-ui.md
+handoffs/04-audit.md
 
 ## Open findings
 - [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.
