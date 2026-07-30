@@ -50,7 +50,7 @@ export async function createSession(userId: string): Promise<string> {
  * concurrent session accumulation (MEDIUM FIX #07).
  */
 export async function invalidateAllSessions(userId: string): Promise<void> {
-  await lucia.invalidateSessionsForUser(userId);
+  await lucia.invalidateUserSessions(userId);
 }
 
 /**
