@@ -6,10 +6,7 @@
 spec: specs/goodform.md
 
 ## Phase
-current:  6 — Delivery
-status:   IN PROGRESS (interrupted work possible)
-owner:    @delivery
-progress: 5/8 closed
+all 8 phases closed.
 
 ## Phases
 [x] 1. Architecture @architect
@@ -17,9 +14,9 @@ progress: 5/8 closed
 [x] 3. Code @code
 [x] 4. Audit @audit
 [x] 5. Security @security
-[»] 6. Delivery @delivery
-[ ] 7. Documentation @docs
-[ ] 8. Closeout @audit
+[x] 6. Delivery @delivery
+[x] 7. Documentation @docs
+[x] 8. Closeout @audit
 
 ## Constraints
 R1  ]
@@ -32,6 +29,10 @@ would fail without it. Untested is unenforced.
 
 ## Artifacts on disk
 contract        docs/contract.md
+readme          README.md
+dockerfile      Dockerfile
+adrs            docs/adr
+license         LICENSE.md
 
 ## Handoffs
 handoffs/01-architecture.md
@@ -40,6 +41,9 @@ handoffs/03-code-infra.md
 handoffs/03-code-ui.md
 handoffs/04-audit.md
 handoffs/05-security.md
+handoffs/06-delivery.md
+handoffs/07-docs.md
+handoffs/08-closeout.md
 
 ## Open findings
 - [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.

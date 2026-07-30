@@ -31,9 +31,9 @@
 - [x] Phase 3 — Code (@code): implementation against those tests
 - [x] Phase 4 — Audit (@audit): code meets tests and contract
 - [x] Phase 5 — Security (@security): OWASP Top 10 2025 audit
-- [ ] Phase 6 — Delivery (@delivery): Docker, CI, observability, migrations (in progress)
-- [ ] Phase 7 — Documentation (@docs): README, API, ADRs, license
-- [ ] Phase 8 — Closeout (@audit): production readiness verdict
+- [x] Phase 6 — Delivery (@delivery): Docker, CI, observability, migrations
+- [x] Phase 7 — Documentation (@docs): README, API, ADRs, license
+- [x] Phase 8 — Closeout (@audit): production readiness verdict
 
 ## Technical contract
 
