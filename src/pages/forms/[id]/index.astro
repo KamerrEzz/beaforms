@@ -82,7 +82,7 @@ if (Astro.request.method === 'POST') {
           {formData.questions.map((q, i) => (
             <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <span style="font-weight:500;">{(q.settings as Record<string, unknown>)?.label ? String((q.settings as Record<string, unknown>).label) : `Question ${i + 1}`}</span>
+                <span style="font-weight:500;">{q.settings?.label ? String(q.settings.label) : ('Question ' + String(i + 1))}</span>
                 <span style="margin-left:0.5rem;font-size:0.75rem;color:var(--color-text-muted);">({String(q.type)})</span>
                 {q.required && <span style="margin-left:0.25rem;color:var(--color-error);">*</span>}
               </div>

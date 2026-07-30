@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import { listForms, createForm } from '../../../actions/forms';
 import { getSessionUser } from '../../../auth/middleware';
 import { authorize } from '../../../domain/authorization';
-import { logger } from '../../../lib/logger';
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   const correlationId = crypto.randomUUID();
