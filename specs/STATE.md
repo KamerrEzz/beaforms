@@ -6,18 +6,18 @@
 spec: specs/goodform.md
 
 ## Phase
-current:  5 — Security
+current:  6 — Delivery
 status:   IN PROGRESS (interrupted work possible)
-owner:    @security
-progress: 4/8 closed
+owner:    @delivery
+progress: 5/8 closed
 
 ## Phases
 [x] 1. Architecture @architect
 [x] 2. Testing @testing
 [x] 3. Code @code
 [x] 4. Audit @audit
-[»] 5. Security @security
-[ ] 6. Delivery @delivery
+[x] 5. Security @security
+[»] 6. Delivery @delivery
 [ ] 7. Documentation @docs
 [ ] 8. Closeout @audit
 
@@ -39,10 +39,16 @@ handoffs/02-testing.md
 handoffs/03-code-infra.md
 handoffs/03-code-ui.md
 handoffs/04-audit.md
+handoffs/05-security.md
 
 ## Open findings
 - [Phase 1] R1 fixed: GDPR data-export and data-deletion endpoints added.
 - [Phase 1] R4 fixed: Notification management endpoints added for both email and webhook retries.
+- [Phase 5] CRITICAL — FINDING-01: GDPR endpoints accept user-supplied organizationId, allowing cross-tenant data export/deletion.
+- [Phase 5] CRITICAL — FINDING-02: Login does not verify password (complete auth bypass).
+- [Phase 5] HIGH — FINDING-03: Notification endpoints missing organization scoping (cross-tenant data leak).
+- [Phase 5] HIGH — FINDING-04: No rate limiting on login endpoint (brute-force vector).
+- [Phase 5
 
 ## How to read this project
 1. This file.
