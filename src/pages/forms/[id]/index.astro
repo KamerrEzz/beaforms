@@ -1,0 +1,116 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getSessionUser } from '../../../auth/middleware';
+import { getForm, publishForm } from '../../../actions/forms';
+import { authorize } from '../../../domain/authorization';
+import { db } from '../../../lib/db';
+
+const user = await getSessionUser(Astro);
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const formId = Astro.params.id;
+if (!formId) {
+  return Astro.redirect('/forms');
+}
+
+const formRecord = await db.form.findUnique({
+  where: { id: formId },
+  select: { organizationId: true },
+});
+
+if (!formRecord) {
+  return Astro.redirect('/forms');
+}
+
+try {
+  authorize(user, 'forms.get', formRecord.organizationId);
+} catch {
+  return Astro.redirect('/forms');
+}
+
+const result = await getForm(formId, user.organizationId);
+const formData = 'form' in result.body ? result.body as { form: Record<string, unknown>; questions: Array<Record<string, unknown>>; rules: unknown[] } : null;
+
+if (!formData) {
+  return Astro.redirect('/forms');
+}
+
+// Handle publish action.
+if (Astro.request.method === 'POST') {
+  const publishResult = await publishForm(formId, user.userId, user.role, user.organizationId);
+  if (publishResult.status === 200) {
+    return Astro.redirect(`/forms/${formId}`);
+  }
+}
+---
+<DashboardLayout title={`${formData.form.title} - Goodform`}>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div>
+      <a href="/forms" style="font-size:0.875rem;color:var(--color-text-muted);">&larr; Back to forms</a>
+      <h1 style="font-size:1.5rem;font-weight:700;margin-top:0.25rem;">{String(formData.form.title)}</h1>
+    </div>
+    <div style="display:flex;gap:0.5rem;">
+      <span style={`display:inline-block;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:500;${
+        formData.form.status === 'Published'
+          ? 'background:#dcfce7;color:#166534;'
+          : formData.form.status === 'Archived'
+          ? 'background:#fef3c7;color:#92400e;'
+          : 'background:#f1f5f9;color:#475569;'
+      }`}>
+        {String(formData.form.status)} v{String(formData.form.version)}
+      </span>
+      {formData.form.status === 'Draft' && (
+        <form method="post">
+          <button type="submit" class="btn">Publish</button>
+        </form>
+      )}
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;">
+    <div>
+      <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Questions</h2>
+      {formData.questions.length === 0 ? (
+        <div style="background:var(--color-surface);border:1px dashed var(--color-border);border-radius:var(--radius);padding:2rem;text-align:center;color:var(--color-text-muted);">
+          No questions yet. Add questions to build your form.
+        </div>
+      ) : (
+        <div>
+          {formData.questions.map((q, i) => (
+            <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span style="font-weight:500;">{(q.settings as Record<string, unknown>)?.label ? String((q.settings as Record<string, unknown>).label) : `Question ${i + 1}`}</span>
+                <span style="margin-left:0.5rem;font-size:0.75rem;color:var(--color-text-muted);">({String(q.type)})</span>
+                {q.required && <span style="margin-left:0.25rem;color:var(--color-error);">*</span>}
+              </div>
+              <span style="font-size:0.75rem;color:var(--color-text-muted);">#{String(q.order)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div>
+      <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Settings</h2>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;">
+        <div style="margin-bottom:0.75rem;">
+          <span style="font-size:0.875rem;color:var(--color-text-muted);">Form ID</span>
+          <div style="font-family:monospace;font-size:0.875rem;word-break:break-all;">{formId}</div>
+        </div>
+        <div style="margin-bottom:0.75rem;">
+          <span style="font-size:0.875rem;color:var(--color-text-muted);">Public URL</span>
+          <div style="font-family:monospace;font-size:0.875rem;">
+            <a href={`/f/${formData.form.id}`} target="_blank">/f/{String(formData.form.id)}</a>
+          </div>
+        </div>
+        <div>
+          <span style="font-size:0.875rem;color:var(--color-text-muted);">Questions</span>
+          <div style="font-size:0.875rem;">{formData.questions.length}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

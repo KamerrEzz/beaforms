@@ -1,0 +1,30 @@
+---
+interface Props {
+  placeholder?: string;
+  value?: string;
+}
+
+const { placeholder = 'Search responses...', value = '' } = Astro.props;
+---
+<form method="get" style="margin-bottom:1rem;">
+  <div style="position:relative;">
+    <input
+      type="text"
+      name="search"
+      value={value}
+      placeholder={placeholder}
+      class="input"
+      style="padding-right:2.5rem;"
+    />
+    <button
+      type="submit"
+      style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--color-text-muted);cursor:pointer;"
+      aria-label="Search"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+    </button>
+  </div>
+</form>

@@ -1,0 +1,11 @@
+---
+import { getSessionUser } from '../auth/middleware';
+
+const user = await getSessionUser(Astro);
+
+if (user) {
+  return Astro.redirect('/forms');
+} else {
+  return Astro.redirect('/login');
+}
+---

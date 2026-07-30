@@ -1,0 +1,70 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import ResultsTable from '../../../components/ResultsTable.astro';
+import SearchBar from '../../../components/SearchBar.astro';
+import CsvExport from '../../../components/CsvExport.astro';
+import { getSessionUser } from '../../../auth/middleware';
+import { getResults } from '../../../actions/results';
+import { authorize } from '../../../domain/authorization';
+import { db } from '../../../lib/db';
+
+const user = await getSessionUser(Astro);
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const formId = Astro.params.id;
+if (!formId) {
+  return Astro.redirect('/forms');
+}
+
+const formRecord = await db.form.findUnique({
+  where: { id: formId },
+  select: { organizationId: true, title: true },
+});
+
+if (!formRecord) {
+  return Astro.redirect('/forms');
+}
+
+try {
+  authorize(user, 'results.get', formRecord.organizationId);
+} catch {
+  return Astro.redirect('/forms');
+}
+
+const search = Astro.url.searchParams.get('search') ?? undefined;
+const result = await getResults(formId, user.organizationId, search);
+
+const submissions = 'submissions' in result.body
+  ? (result.body as { submissions: Array<{
+      id: string;
+      token: string;
+      version: number;
+      createdAt: string;
+      answers: Array<{ questionId: string; questionType: string; value: unknown }>;
+    }> }).submissions
+  : [];
+
+// Extract unique question labels from the first submission's answers.
+const questions = submissions.length > 0
+  ? Array.from(new Set(submissions[0].answers.map((a) => a.questionId))).map((qId) => {
+      const answer = submissions[0].answers.find((a) => a.questionId === qId);
+      return { id: qId, label: `Question ${qId.slice(-4)}` };
+    })
+  : [];
+---
+<DashboardLayout title={`Results: ${formRecord.title} - Goodform`}>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div>
+      <a href={`/forms/${formId}`} style="font-size:0.875rem;color:var(--color-text-muted);">&larr; Back to form</a>
+      <h1 style="font-size:1.5rem;font-weight:700;margin-top:0.25rem;">Results: {formRecord.title}</h1>
+    </div>
+    <CsvExport formId={formId} />
+  </div>
+
+  <SearchBar value={search ?? ''} />
+
+  <ResultsTable submissions={submissions} questions={questions} />
+</DashboardLayout>

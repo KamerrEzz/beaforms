@@ -1,0 +1,62 @@
+---
+interface Form {
+  id: string;
+  title: string;
+  status: string;
+  version: number;
+  submissionCount: number;
+  updatedAt: string;
+}
+
+interface Props {
+  forms: Form[];
+}
+
+const { forms } = Astro.props;
+---
+<table style="width:100%;border-collapse:collapse;">
+  <thead>
+    <tr>
+      <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);">Title</th>
+      <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);">Status</th>
+      <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);">Version</th>
+      <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);">Responses</th>
+      <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {forms.map((form) => (
+      <tr style="border-bottom:1px solid var(--color-border);">
+        <td style="padding:0.75rem;">
+          <a href={`/forms/${form.id}`} style="font-weight:500;">{form.title}</a>
+        </td>
+        <td style="padding:0.75rem;">
+          <span style={`display:inline-block;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:500;${
+            form.status === 'Published'
+              ? 'background:#dcfce7;color:#166534;'
+              : form.status === 'Archived'
+              ? 'background:#fef3c7;color:#92400e;'
+              : 'background:#f1f5f9;color:#475569;'
+          }`}>
+            {form.status}
+          </span>
+        </td>
+        <td style="padding:0.75rem;color:var(--color-text-muted);">v{form.version}</td>
+        <td style="padding:0.75rem;color:var(--color-text-muted);">{form.submissionCount}</td>
+        <td style="padding:0.75rem;">
+          <div style="display:flex;gap:0.5rem;">
+            <a href={`/forms/${form.id}`} class="btn btn-secondary" style="padding:0.25rem 0.5rem;font-size:0.75rem;">Edit</a>
+            {form.status === 'Published' && (
+              <a href={`/forms/${form.id}/results`} class="btn btn-secondary" style="padding:0.25rem 0.5rem;font-size:0.75rem;">Results</a>
+            )}
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+{forms.length === 0 && (
+  <div style="text-align:center;padding:3rem;color:var(--color-text-muted);">
+    No forms yet. Create your first form to get started.
+  </div>
+)}

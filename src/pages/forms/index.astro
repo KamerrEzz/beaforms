@@ -1,0 +1,37 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import FormsTable from '../../components/FormsTable.astro';
+import { getSessionUser } from '../../auth/middleware';
+import { listForms } from '../../actions/forms';
+import { authorize } from '../../domain/authorization';
+
+const user = await getSessionUser(Astro);
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+try {
+  authorize(user, 'forms.list', user.organizationId);
+} catch {
+  return Astro.redirect('/login');
+}
+
+const result = await listForms(user.organizationId);
+const forms = 'forms' in result.body ? (result.body as { forms: Array<{
+  id: string;
+  title: string;
+  status: string;
+  version: number;
+  submissionCount: number;
+  updatedAt: string;
+}> }).forms : [];
+---
+<DashboardLayout title="Forms - Goodform">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <h1 style="font-size:1.5rem;font-weight:700;">Forms</h1>
+    <a href="/forms/new" class="btn">New Form</a>
+  </div>
+
+  <FormsTable forms={forms} />
+</DashboardLayout>

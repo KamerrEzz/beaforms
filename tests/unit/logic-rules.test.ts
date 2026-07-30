@@ -9,6 +9,8 @@ import { describe, it, expect } from 'vitest';
  * They do not test persistence — only the pure evaluation logic.
  */
 
+import { evaluateNextQuestion } from '../../src/domain/logic-rules';
+
 // ---------- types ----------
 
 interface Question {
@@ -23,17 +25,6 @@ interface LogicRule {
   condition: { operator: string; value: string | number };
   action: { type: 'Jump'; targetQuestionId: string } | { type: 'End' };
 }
-
-/**
- * Given the current question, its answer, all rules, and the question list,
- * returns the ID of the next question to present, or null if the form ends.
- */
-declare function evaluateNextQuestion(
-  currentQuestionId: string,
-  answer: string | number | string[],
-  rules: LogicRule[],
-  questions: Question[]
-): string | null;
 
 // -----------------------------------------------------------------
 

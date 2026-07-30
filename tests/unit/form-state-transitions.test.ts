@@ -10,7 +10,9 @@ import { describe, it, expect } from 'vitest';
  * satisfy them — the tests do not describe how it does so.
  */
 
-// ---------- types mirrored from the spec (not an import) ----------
+import { transitionForm } from '../../src/domain/form-state';
+
+// ---------- types mirrored from the spec ----------
 
 type FormStatus = 'Draft' | 'Published' | 'Archived';
 
@@ -21,19 +23,6 @@ interface Form {
   status: FormStatus;
   version: number;
 }
-
-/**
- * Pure domain function: attempts a state transition on a form.
- * Returns the updated form on success, or throws with a descriptive message.
- *
- * The tests below define what transitions are legal.
- */
-declare function transitionForm(
-  form: Form,
-  action: 'publish' | 'archive',
-  userId: string,
-  role: 'Admin' | 'Employee'
-): Form;
 
 // -----------------------------------------------------------------
 

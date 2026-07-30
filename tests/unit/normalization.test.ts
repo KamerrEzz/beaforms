@@ -7,11 +7,7 @@ import { describe, it, expect } from 'vitest';
  * Tests define the expected transformations, not the implementation.
  */
 
-// ---------- pure functions declared as tests-of-behavior ----------
-
-declare function normalizeEmail(input: string): string;
-declare function truncateText(input: string, maxLen: number): string;
-declare function escapeCsvField(value: string): string;
+import { normalizeEmail, truncateText, escapeCsvField } from '../../src/domain/normalization';
 
 // -----------------------------------------------------------------
 

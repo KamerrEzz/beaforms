@@ -1,0 +1,100 @@
+---
+interface Props {
+  question: {
+    id: string;
+    type: string;
+    required: boolean;
+    settings: Record<string, unknown>;
+  };
+  value?: string | number | string[];
+  index: number;
+}
+
+const { question, value, index } = Astro.props;
+const settings = question.settings as Record<string, unknown>;
+const label = settings.label ? String(settings.label) : `Question ${index + 1}`;
+const placeholder = settings.placeholder ? String(settings.placeholder) : '';
+---
+<div class="question-card" style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;">
+  <label style="display:block;margin-bottom:0.5rem;font-weight:500;">
+    {label}
+    {question.required && <span style="color:var(--color-error);">*</span>}
+  </label>
+
+  {question.type === 'Text' && (
+    <input
+      type="text"
+      name={question.id}
+      value={value ? String(value) : ''}
+      placeholder={placeholder}
+      required={question.required}
+      class="input"
+    />
+  )}
+
+  {question.type === 'Email' && (
+    <input
+      type="email"
+      name={question.id}
+      value={value ? String(value) : ''}
+      placeholder={placeholder}
+      required={question.required}
+      class="input"
+    />
+  )}
+
+  {question.type === 'LongAnswer' && (
+    <textarea
+      name={question.id}
+      placeholder={placeholder}
+      required={question.required}
+      class="input"
+      rows={4}
+    >{value ? String(value) : ''}</textarea>
+  )}
+
+  {question.type === 'Select' && (
+    <select name={question.id} required={question.required} class="input">
+      <option value="">Select an option...</option>
+      {(settings.options as string[] ?? []).map((opt) => (
+        <option value={opt} selected={value === opt}>{opt}</option>
+      ))}
+    </select>
+  )}
+
+  {question.type === 'MultiSelect' && (
+    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+      {(settings.options as string[] ?? []).map((opt) => {
+        const selected = Array.isArray(value) && value.includes(opt);
+        return (
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:400;">
+            <input
+              type="checkbox"
+              name={question.id}
+              value={opt}
+              checked={selected}
+            />
+            {opt}
+          </label>
+        );
+      })}
+    </div>
+  )}
+
+  {question.type === 'Rating' && (
+    <div style="display:flex;gap:0.5rem;">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <label style="display:flex;align-items:center;gap:0.25rem;">
+          <input
+            type="radio"
+            name={question.id}
+            value={n}
+            checked={value === n}
+            required={question.required}
+          />
+          {n}
+        </label>
+      ))}
+    </div>
+  )}
+</div>

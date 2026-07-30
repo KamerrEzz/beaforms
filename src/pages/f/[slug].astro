@@ -1,0 +1,137 @@
+---
+import FormLayout from '../../layouts/FormLayout.astro';
+import QuestionCard from '../../components/QuestionCard.astro';
+import ProgressBar from '../../components/ProgressBar.astro';
+import { db } from '../../lib/db';
+import { evaluateNextQuestion } from '../../domain/logic-rules';
+
+const slug = Astro.params.slug;
+
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+// Fetch the form with questions and rules.
+const form = await db.form.findUnique({
+  where: { id: slug },
+  include: {
+    questions: {
+      orderBy: { order: 'asc' },
+      include: { logicRules: true },
+    },
+  },
+});
+
+if (!form || form.status !== 'Published') {
+  return Astro.redirect('/');
+}
+
+const questions = form.questions;
+const rules = questions.flatMap((q) => q.logicRules);
+
+// Handle form submission.
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const token = formData.get('token') as string || crypto.randomUUID();
+  const currentQuestionId = formData.get('currentQuestionId') as string;
+  const answer = formData.get('answer') as string;
+
+  // Build answers from the form data.
+  const answers: Array<{ questionId: string; value: string | number | string[] }> = [];
+  for (const [key, val] of formData.entries()) {
+    if (key.startsWith('q_')) {
+      const questionId = key.slice(2);
+      answers.push({ questionId, value: String(val) });
+    }
+  }
+
+  // Check if this is the final submission or a step navigation.
+  const action = formData.get('action') as string;
+
+  if (action === 'submit') {
+    // Final submission — POST to the API.
+    const res = await fetch(new URL('/api/forms/' + slug + '/submissions', Astro.url.origin), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        formId: slug,
+        token,
+        answers: answers.map((a) => ({ questionId: a.questionId, value: a.value })),
+      }),
+    });
+
+    if (res.ok) {
+      return Astro.redirect(`/f/${slug}/thank-you`);
+    }
+  }
+
+  // Step navigation — determine the next question.
+  const currentQuestion = questions.find((q) => q.id === currentQuestionId);
+  if (currentQuestion && answer) {
+    const nextId = evaluateNextQuestion(currentQuestionId, answer, rules, questions);
+    // Redirect to the next question (or thank you if null).
+    if (nextId) {
+      return Astro.redirect(`/f/${slug}?q=${nextId}&token=${token}`);
+    } else {
+      return Astro.redirect(`/f/${slug}/thank-you`);
+    }
+  }
+}
+
+// Determine which question to show.
+const questionId = Astro.url.searchParams.get('q');
+const token = Astro.url.searchParams.get('token') || crypto.randomUUID();
+
+let currentQuestionIndex = 0;
+if (questionId) {
+  const idx = questions.findIndex((q) => q.id === questionId);
+  if (idx >= 0) currentQuestionIndex = idx;
+}
+
+const currentQuestion = questions[currentQuestionIndex];
+const isFirst = currentQuestionIndex === 0;
+const isLast = currentQuestionIndex === questions.length - 1;
+---
+<FormLayout title={form.title}>
+  <div style="margin-bottom:1.5rem;">
+    <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">{form.title}</h1>
+  </div>
+
+  <ProgressBar current={currentQuestionIndex + 1} total={questions.length} />
+
+  <form method="post">
+    <input type="hidden" name="token" value={token} />
+    <input type="hidden" name="currentQuestionId" value={currentQuestion.id} />
+
+    <QuestionCard
+      question={{
+        id: currentQuestion.id,
+        type: currentQuestion.type,
+        required: currentQuestion.required,
+        settings: (currentQuestion.settings as Record<string, unknown>) ?? {},
+      }}
+      index={currentQuestionIndex}
+    />
+
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;">
+      {!isFirst && (
+        <a
+          href={`/f/${slug}?q=${questions[currentQuestionIndex - 1].id}&token=${token}`}
+          class="btn btn-secondary"
+        >
+          Previous
+        </a>
+      )}
+      <div style="flex:1;"></div>
+      {isLast ? (
+        <button type="submit" name="action" value="submit" class="btn">
+          Submit
+        </button>
+      ) : (
+        <button type="submit" name="action" value="next" class="btn">
+          Next
+        </button>
+      )}
+    </div>
+  </form>
+</FormLayout>

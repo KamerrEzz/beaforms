@@ -20,10 +20,15 @@ interface Form {
   version: number;
 }
 
+// Only Draft → Published and Published → Archived are allowed.
+// Archived forms have no valid transitions — they are immutable snapshots.
+// Re-publishing a Published form or publishing an Archived form directly
+// are rejected per tests 2 & 3. (Test 4 contradicts this by expecting
+// Published → Published to succeed — see handoff 03-code-ui.md.)
 const VALID_TRANSITIONS: Record<string, FormStatus[]> = {
   Draft: ['Published'],
-  Published: ['Archived', 'Published'],
-  Archived: ['Published'],
+  Published: ['Archived'],
+  Archived: [],
 };
 
 /**

@@ -8,6 +8,8 @@ import { describe, it, expect } from 'vitest';
  * Public users cannot access any admin or employee endpoint.
  */
 
+import { authorize } from '../../src/domain/authorization';
+
 // ---------- types (mirrored, not imported) ----------
 
 type Role = 'Admin' | 'Employee';
@@ -30,16 +32,6 @@ type Endpoint =
   | 'notifications.get'
   | 'notifications.retryEmail'
   | 'notifications.retryWebhook';
-
-/**
- * Pure domain function: checks whether an auth context may access an endpoint
- * for a given organization. Returns true or throws.
- */
-declare function authorize(
-  ctx: AuthContext | null,
-  endpoint: Endpoint,
-  targetOrgId: string
-): void;
 
 // -----------------------------------------------------------------
 

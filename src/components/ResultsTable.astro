@@ -1,0 +1,64 @@
+---
+interface Answer {
+  questionId: string;
+  questionType: string;
+  value: unknown;
+}
+
+interface Submission {
+  id: string;
+  token: string;
+  version: number;
+  createdAt: string;
+  answers: Answer[];
+}
+
+interface Props {
+  submissions: Submission[];
+  questions: Array<{ id: string; label: string }>;
+}
+
+const { submissions, questions } = Astro.props;
+---
+<div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;min-width:600px;">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);white-space:nowrap;">Submitted</th>
+        <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);white-space:nowrap;">Version</th>
+        {questions.map((q) => (
+          <th style="text-align:left;padding:0.75rem;border-bottom:2px solid var(--color-border);font-size:0.875rem;color:var(--color-text-muted);white-space:nowrap;">{q.label}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {submissions.map((sub) => {
+        const answerMap = new Map(sub.answers.map((a) => [a.questionId, a.value]));
+        return (
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:0.75rem;white-space:nowrap;font-size:0.875rem;color:var(--color-text-muted);">
+              {new Date(sub.createdAt).toLocaleDateString()}
+            </td>
+            <td style="padding:0.75rem;font-size:0.875rem;color:var(--color-text-muted);">v{sub.version}</td>
+            {questions.map((q) => {
+              const val = answerMap.get(q.id);
+              const display = val === undefined || val === null
+                ? '-'
+                : Array.isArray(val) ? val.join(', ') : String(val);
+              return (
+                <td style="padding:0.75rem;font-size:0.875rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title={display}>
+                  {display}
+                </td>
+              );
+            })}
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+{submissions.length === 0 && (
+  <div style="text-align:center;padding:3rem;color:var(--color-text-muted);">
+    No responses yet.
+  </div>
+)}
