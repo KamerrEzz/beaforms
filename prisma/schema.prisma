@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum FormStatus {
+  Draft
+  Published
+  Archived
+}
+
+enum QuestionType {
+  Text
+  Email
+  Select
+  MultiSelect
+  Rating
+  LongAnswer
+}
+
+enum UserRole {
+  Admin
+  Employee
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  delivered
+  failed
+}
+
+// --- Tables ---
+
+model Organization {
+  id   String @id @default(cuid())
+  name String
+
+  users  User[]
+  forms  Form[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizations")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  role           UserRole
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessions     Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Form {
+  id             String     @id @default(cuid())
+  title          String
+  organizationId String
+  status         FormStatus @default(Draft)
+  version        Int        @default(0)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  questions    Question[]
+  submissions  Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("forms")
+}
+
+model Question {
+  id     String       @id @default(cuid())
+  formId String
+  type   QuestionType
+  order  Int
+  required Boolean    @default(false)
+  settings Json       @default("{}")
+
+  form       Form        @relation(fields: [formId], references: [id], onDelete: Cascade)
+  logicRules LogicRule[]
+  answers    Answer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([formId])
+  @@map("questions")
+}
+
+model LogicRule {
+  id         String @id @default(cuid())
+  questionId String
+  condition  Json
+  action     Json
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([questionId])
+  @@map("logic_rules")
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  formId    String
+  token     String   @unique
+  version   Int
+  createdAt DateTime @default(now())
+
+  form    Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  notifications NotificationJob[]
+
+  @@index([formId])
+  @@index([token])
+  @@map("submissions")
+}
+
+model Answer {
+  id           String @id @default(cuid())
+  submissionId String
+  questionId   String
+  value        Json
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([questionId])
+  @@map("answers")
+}
+
+model NotificationJob {
+  id           String             @id @default(cuid())
+  submissionId String
+  channel      String
+  status       NotificationStatus @default(pending)
+  attempts     Int                @default(0)
+  lastAttempt  DateTime?
+  payload      Json?
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([submissionId])
+  @@index([status])
+  @@map("notification_jobs")
+}

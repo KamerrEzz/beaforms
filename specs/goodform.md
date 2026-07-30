@@ -27,8 +27,8 @@
 ## Phases
 
 - [x] Phase 1 — Architecture (@architect): technical contract and stack decisions
-- [ ] Phase 2 — Testing (@testing): expected behavior as tests (in progress)
-- [ ] Phase 3 — Code (@code): implementation against those tests
+- [x] Phase 2 — Testing (@testing): expected behavior as tests
+- [ ] Phase 3 — Code (@code): implementation against those tests (in progress)
 - [ ] Phase 4 — Audit (@audit): code meets tests and contract
 - [ ] Phase 5 — Security (@security): OWASP Top 10 2025 audit
 - [ ] Phase 6 — Delivery (@delivery): Docker, CI, observability, migrations
