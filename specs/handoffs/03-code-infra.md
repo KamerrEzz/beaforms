@@ -16,7 +16,7 @@
 - Version field on Form (integer, incremented on publish)
 
 ### Domain layer (`src/domain/`)
-- `form-state.ts` — `transitionForm()` state machine: Draft→Published→Archived, version increment, Admin-only guard
+- `form-state.ts` — `transitionForm()` state machine: Draft→Published→Archived→Draft(newDraft), version increment, Admin-only guard
 - `authorization.ts` — `authorize()` RBAC predicates: Admin/Employee endpoint mapping, org isolation, unauthenticated rejection
 - `normalization.ts` — `normalizeEmail()`, `truncateText()` (UTF-8 safe), `escapeCsvField()` (RFC 4180)
 - `logic-rules.ts` — `evaluateNextQuestion()` with equals/contains/greaterThan operators, loop prevention, deleted question fallthrough

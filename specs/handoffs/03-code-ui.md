@@ -65,13 +65,11 @@
 | `normalization.test.ts` | 15/15 passing | All pass |
 | `logic-rules.test.ts` | 9/9 passing | All pass |
 
-### Test contradiction in `form-state-transitions.test.ts`
+### Test contradiction in `form-state-transitions.test.ts` — FIXED
 
-Tests 2 & 3 explicitly say "rejects publishing a Published/Archived form" and expect `/invalid transition/i`. Test 4 ("publishes a second time creating version 2") expects `transitionForm(publishedForm, 'publish', ...)` to succeed and increment the version.
+Tests 2 & 3 explicitly say "rejects publishing a Published/Archived form" and expect `/invalid transition/i`. Test 4 ("publishes a second time creating version 2") expected `transitionForm(publishedForm, 'publish', ...)` to succeed.
 
-These are mutually exclusive. The implementation matches tests 2 & 3 (Published → Published and Archived → Published are rejected). Test 4 fails because it assumes re-publishing is allowed.
-
-**Recommendation:** Test 4 should be removed or rewritten to test version semantics through the Draft → Published → Archive → re-create Draft → Published flow, not by re-publishing an already-Published form.
+**Fixed:** Test 4 was rewritten to test version semantics through the correct flow: Draft → Published (v1) → Archive → newDraft → Published (v2). The `newDraft` transition was added to `form-state.ts`.
 
 ### Integration tests — require infrastructure
 
