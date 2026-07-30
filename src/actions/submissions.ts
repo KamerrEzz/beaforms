@@ -13,10 +13,10 @@ import { logger } from '../lib/logger';
 
 const submissionSchema = z.object({
   formId: z.string(),
-  token: z.string().min(1),
+  token: z.string().min(1).optional(),
   answers: z.array(
     z.object({
-      questionId: z.string(),
+      questionOrder: z.number().int().positive(),
       value: z.union([z.string(), z.number(), z.array(z.string())]),
     })
   ),
@@ -41,7 +41,8 @@ export async function submitForm(
     return { status: 400, body: { error: 'Invalid input' } };
   }
 
-  const { formId, token, answers } = parsed.data;
+  const { formId, token: rawToken, answers } = parsed.data;
+  const token = rawToken ?? crypto.randomUUID();
 
   // Rate limiting via Redis INCR + EXPIRE (atomic, no race condition).
   const redis = getRedis();
@@ -80,24 +81,25 @@ export async function submitForm(
   });
 
   if (!form) {
-    return { status: 400, body: { error: 'Form not found' } };
+    return { status: 404, body: { error: 'Form not found' } };
   }
 
   if (form.status !== 'Published') {
     return { status: 400, body: { error: 'Form is not accepting submissions' } };
   }
 
-  // Validate required questions are answered.
+  // Look up questions by order to map questionOrder -> questionId.
   const questions = await db.question.findMany({
     where: { formId },
-    select: { id: true, required: true },
+    select: { id: true, order: true, required: true },
   });
 
-  const requiredIds = questions.filter((q) => q.required).map((q) => q.id);
-  const answeredIds = answers.map((a) => a.questionId);
-  const missing = requiredIds.filter((id) => !answeredIds.includes(id));
+  const orderToId = new Map(questions.map((q) => [q.order, q.id]));
+  const requiredOrders = questions.filter((q) => q.required).map((q) => q.order);
+  const answeredOrders = answers.map((a) => a.questionOrder);
+  const missingOrders = requiredOrders.filter((o) => !answeredOrders.includes(o));
 
-  if (missing.length > 0) {
+  if (missingOrders.length > 0) {
     return { status: 400, body: { error: 'Missing required answers' } };
   }
 
@@ -112,11 +114,17 @@ export async function submitForm(
     });
 
     await tx.answer.createMany({
-      data: answers.map((a) => ({
-        submissionId: sub.id,
-        questionId: a.questionId,
-        value: a.value,
-      })),
+      data: answers.map((a) => {
+        const questionId = orderToId.get(a.questionOrder);
+        if (!questionId) {
+          throw new Error(`Question with order ${a.questionOrder} not found`);
+        }
+        return {
+          submissionId: sub.id,
+          questionId,
+          value: a.value,
+        };
+      }),
     });
 
     return sub;
@@ -129,7 +137,7 @@ export async function submitForm(
   });
 
   return {
-    status: 200,
+    status: 201,
     body: { submissionId: submission.id, formVersion: form.version },
   };
 }
